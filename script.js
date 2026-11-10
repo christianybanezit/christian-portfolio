@@ -1,280 +1,347 @@
+
+/*
+  Christian Ybañez portfolio interactions.
+  Keep project details here so case studies can be updated in one place.
+  Add genuine repository or prototype URLs to a project's links array when available.
+*/
 const projectData = {
-    evote: {
-        title: "E-VOTE",
-        images: [
-            "images/evote-1.jpg",
-            "images/evote-2.jpg",
-            "images/evote-3.jpg",
-            "images/evote-4.jpg"
-        ],
-        description: "A client-based mobile voting system designed for school elections and voting events. The system allows students to vote digitally while administrators can manage elections, candidates, and voting results.",
-        technologies: [
-            "Flutter",
-            "Firebase",
-            "Firestore",
-            "Mobile Development"
-        ],
-        role: "I worked on the design and development of the system, including the user interface, voting flow, database structure, and other parts of the application."
-    },
-
-    cafe: {
-        title: "KAVENTRA CAFÉ",
-        images: [
-            "images/cafe-1.jpg",
-            "images/cafe-2.jpg",
-            "images/cafe-3.jpg"
-        ],
-        description: "A modern café website concept designed to provide a clean and attractive online experience. The project focuses on UI/UX design, layout, typography, and visual presentation.",
-        technologies: [
-            "Figma",
-            "UI/UX Design",
-            "Web Design",
-            "Prototyping"
-        ],
-        role: "I designed the website layout, user interface, visual style, and interactive prototype."
-    },
-
-    database: {
-        title: "STUDENT DATABASE",
-        images: [
-            "images/database-1.jpg",
-            "images/database-2.jpg"
-        ],
-        description: "A database project created to organize student information and related records. The project focuses on proper database structure and relationships between different types of information.",
-        technologies: [
-            "SQL",
-            "Database Design",
-            "ERD",
-            "Data Management"
-        ],
-        role: "I worked on the database structure, entity relationships, and organization of the data."
-    },
-
-    portfolio: {
-        title: "PORTFOLIO WEBSITE",
-        images: [
-            "images/portfolio-1.jpg",
-            "images/portfolio-2.jpg"
-        ],
-        description: "A personal portfolio website created to showcase my background, skills, projects, and experience as an IT student.",
-        technologies: [
-            "HTML",
-            "CSS",
-            "JavaScript",
-            "Responsive Design"
-        ],
-        role: "I designed and developed the website using HTML, CSS, and JavaScript."
-    }
+  evote: {
+    title: "E-VOTE",
+    category: "MOBILE APPLICATION / SCHOOL VOTING",
+    images: ["images/evote-1.jpg", "images/evote-2.jpg", "images/evote-3.jpg", "images/evote-4.jpg"],
+    overview: "A mobile voting system designed for school elections and voting events. It gives students a digital way to vote while providing tools for administrators to manage election activities.",
+    goal: "Make school voting activities easier to carry out through a mobile experience, with dedicated tools for the people managing an election.",
+    contribution: "I contributed to the interface, the voting flow, and the database structure, alongside other parts of the application.",
+    focus: "Keeping the voting steps understandable and organizing the information needed for elections, candidates, and results.",
+    next: "I'd like to keep improving the user experience and strengthen testing around different voting scenarios.",
+    highlights: ["Digital student voting flow", "Election and candidate management", "Voting results", "Mobile interface and database work"],
+    technologies: ["Dart", "Flutter", "Firebase", "Firestore", "Mobile Development"],
+    links: []
+  },
+  cafe: {
+    title: "Kaventra Café",
+    category: "UI/UX DESIGN / WEBSITE CONCEPT",
+    images: ["images/cafe-1.jpg", "images/cafe-2.jpg", "images/cafe-3.jpg"],
+    overview: "A café website concept where I explored what a clean, welcoming online experience could look like through design and prototyping.",
+    goal: "Create a simple, appealing website concept that fits a café's visual identity and feels easy to navigate.",
+    contribution: "I designed the page layout, visual style, interface elements, and an interactive prototype in Figma.",
+    focus: "Typography, spacing, layout consistency, and the way different parts of the interface work together.",
+    next: "I'd like to test the prototype with users and explore how the design would translate into a responsive website.",
+    highlights: ["Website layout concept", "Figma interface design", "Typography and visual styling", "Interactive prototype"],
+    technologies: ["Figma", "UI/UX Design", "Web Design", "Prototyping"],
+    links: []
+  },
+  database: {
+    title: "Student Database",
+    category: "DATABASE DESIGN / DATA ORGANIZATION",
+    images: ["images/database-1.jpg", "images/database-2.jpg"],
+    overview: "A database project built around organizing student information and the records connected to it.",
+    goal: "Keep student-related information structured so the relationships between different records are easier to understand.",
+    contribution: "I worked on the database structure, entity relationships, and the way the information was organized.",
+    focus: "Thinking through how data connects before building the database structure, rather than keeping everything in one place.",
+    next: "I'd like to expand the documentation with sample queries and more examples of how the database is used.",
+    highlights: ["Student information organization", "Database tables and relationships", "Entity-relationship design", "SQL-based data structure"],
+    technologies: ["SQL", "Database Design", "ERD", "Data Management"],
+    links: []
+  },
+  portfolio: {
+    title: "Portfolio Website",
+    category: "FRONT-END DEVELOPMENT / PERSONAL WEBSITE",
+    images: ["images/portfolio-1.jpg", "images/portfolio-2.jpg"],
+    overview: "The site you're browsing now. I built it to bring my projects, interests, and technical skills into one easy-to-explore place.",
+    goal: "Create a personal website that clearly presents who I am and gives visitors a closer look at the work I've done.",
+    contribution: "I designed and developed the site using HTML, CSS, and JavaScript, including the project cards, gallery, and responsive layout.",
+    focus: "Readable content, consistent styling, mobile-friendly layouts, and keyboard-friendly interactions.",
+    next: "I'll continue refining the case studies and testing accessibility and performance as the site grows.",
+    highlights: ["Responsive layouts", "Project case-study gallery", "Mobile navigation", "Accessible dialog behavior and theme toggle"],
+    technologies: ["HTML", "CSS", "JavaScript", "Responsive Design"],
+    links: []
+  }
 };
 
-let currentProject = null;
-let currentImageIndex = 0;
+/* Project filters: categories and clickable skills */
+const projectCards = [...document.querySelectorAll(".project-card")];
+const filterButtons = [...document.querySelectorAll(".filter-button")];
+const filterStatus = document.getElementById("filterStatus");
+const emptyProjects = document.getElementById("emptyProjects");
 
-function showProject(projectName) {
-    const project = projectData[projectName];
+function filterProjects(type, value = "all") {
+  const normalized = value.toLowerCase();
+  let visibleCount = 0;
 
-    if (!project) {
-        return;
-    }
+  projectCards.forEach((card) => {
+    const matches = type === "skill"
+      ? card.dataset.tech.split(",").some((tech) => tech.trim() === normalized)
+      : normalized === "all" || card.dataset.category === normalized;
 
-    currentProject = project;
-    currentImageIndex = 0;
+    card.hidden = !matches;
+    if (matches) visibleCount += 1;
+  });
 
-    const modal = document.getElementById("projectModal");
-    const title = document.getElementById("modalTitle");
-    const image = document.getElementById("modalImage");
-    const description = document.getElementById("modalDescription");
-    const technologies = document.getElementById("modalTechnologies");
-    const role = document.getElementById("modalRole");
-    const dots = document.getElementById("galleryDots");
+  filterButtons.forEach((button) => {
+    const active = type === "category" && button.dataset.filter === normalized;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
 
-    title.textContent = project.title;
-    description.textContent = project.description;
-    role.textContent = project.role;
+  if (type === "skill") {
+    filterStatus.textContent = `${visibleCount} project${visibleCount === 1 ? "" : "s"} using ${value}`;
+  } else if (normalized === "all") {
+    filterStatus.textContent = `Showing all ${visibleCount} projects`;
+  } else {
+    filterStatus.textContent = `${visibleCount} ${value} project${visibleCount === 1 ? "" : "s"}`;
+  }
 
-    technologies.innerHTML = "";
+  const selectedSkill = type === "skill";
+  document.querySelectorAll(".skill-chip").forEach((button) => {
+    button.setAttribute("aria-pressed", String(selectedSkill && button.dataset.skill.toLowerCase() === normalized));
+  });
 
-    project.technologies.forEach(function (technology) {
-        const tag = document.createElement("span");
+  if (visibleCount === 0) {
+    document.getElementById("emptyProjectsTitle").textContent = "No matching featured project yet";
+    document.getElementById("emptyProjectsMessage").textContent = selectedSkill
+      ? `I haven't featured a project using ${value} here yet. You can still explore my other work.`
+      : "Try another category or view all of my projects.";
+  }
+  emptyProjects.hidden = visibleCount !== 0;
+}
 
-        tag.className = "technology-tag";
-        tag.textContent = technology;
+filterButtons.forEach((button) => {
+  button.addEventListener("click", () => filterProjects("category", button.dataset.filter));
+});
 
-        technologies.appendChild(tag);
+document.querySelectorAll(".skill-chip").forEach((button) => {
+  button.addEventListener("click", () => {
+    filterProjects("skill", button.dataset.skill);
+    document.getElementById("projects").scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
     });
+  });
+});
 
-    dots.innerHTML = "";
+document.getElementById("resetFilter").addEventListener("click", () => filterProjects("category", "all"));
 
-    project.images.forEach(function (_, index) {
-        const dot = document.createElement("button");
+/* Project dialog */
+const modal = document.getElementById("projectModal");
+const modalPanel = modal.querySelector(".modal-panel");
+const modalImage = document.getElementById("modalImage");
+const galleryFallback = document.getElementById("galleryFallback");
+const galleryDots = document.getElementById("galleryDots");
+const galleryCount = document.getElementById("galleryCount");
+const closeModalButton = document.getElementById("closeModal");
+const galleryPrev = document.getElementById("galleryPrev");
+const galleryNext = document.getElementById("galleryNext");
+const pageRegions = [document.querySelector(".site-header"), document.getElementById("main"), document.querySelector(".footer"), document.getElementById("backToTop")];
+let activeProject = null;
+let activeImageIndex = 0;
+let returnFocusTo = null;
 
-        dot.type = "button";
-        dot.className = "gallery-dot";
-        dot.setAttribute("aria-label", "Show image " + (index + 1));
+function fillText(id, value) {
+  document.getElementById(id).textContent = value;
+}
 
-        dot.addEventListener("click", function () {
-            currentImageIndex = index;
-            updateGallery();
-        });
+function fillTags(id, values) {
+  const container = document.getElementById(id);
+  container.replaceChildren();
+  values.forEach((value) => {
+    const tag = document.createElement("span");
+    tag.textContent = value;
+    container.appendChild(tag);
+  });
+}
 
-        dots.appendChild(dot);
-    });
+function fillHighlights(items) {
+  const list = document.getElementById("modalHighlights");
+  list.replaceChildren();
+  items.forEach((item) => {
+    const entry = document.createElement("li");
+    entry.textContent = item;
+    list.appendChild(entry);
+  });
+}
 
-    updateGallery();
-
-    modal.classList.add("show");
-    modal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
+function fillResourceLinks(links) {
+  const container = document.getElementById("projectResources");
+  container.replaceChildren();
+  links.forEach(({ label, url }) => {
+    if (typeof url !== "string" || !/^https:\/\//i.test(url)) return;
+    const link = document.createElement("a");
+    link.href = url;
+    link.textContent = `${label} ↗`;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    container.appendChild(link);
+  });
 }
 
 function updateGallery() {
-    if (!currentProject) {
-        return;
-    }
-
-    const image = document.getElementById("modalImage");
-    const counter = document.getElementById("imageCounter");
-    const dots = document.querySelectorAll(".gallery-dot");
-
-    image.src = currentProject.images[currentImageIndex];
-    image.alt = currentProject.title + " project image " + (currentImageIndex + 1);
-
-    counter.textContent =
-        (currentImageIndex + 1) +
-        " / " +
-        currentProject.images.length;
-
-    dots.forEach(function (dot, index) {
-        dot.classList.toggle(
-            "active",
-            index === currentImageIndex
-        );
-    });
+  if (!activeProject || !activeProject.images.length) return;
+  const filename = activeProject.images[activeImageIndex];
+  galleryFallback.hidden = true;
+  modalImage.hidden = false;
+  modalImage.alt = `${activeProject.title}, screenshot ${activeImageIndex + 1} of ${activeProject.images.length}`;
+  modalImage.src = filename;
+  galleryCount.textContent = `${activeImageIndex + 1} / ${activeProject.images.length}`;
+  [...galleryDots.children].forEach((dot, index) => {
+    const selected = index === activeImageIndex;
+    dot.classList.toggle("active", selected);
+    dot.setAttribute("aria-current", String(selected));
+  });
 }
 
-function nextImage() {
-    if (!currentProject) {
-        return;
-    }
-
-    currentImageIndex++;
-
-    if (currentImageIndex >= currentProject.images.length) {
-        currentImageIndex = 0;
-    }
-
-    updateGallery();
+function moveGallery(direction) {
+  if (!activeProject || activeProject.images.length < 2) return;
+  activeImageIndex = (activeImageIndex + direction + activeProject.images.length) % activeProject.images.length;
+  updateGallery();
 }
 
-function previousImage() {
-    if (!currentProject) {
-        return;
-    }
+function showProject(projectKey) {
+  const project = projectData[projectKey];
+  if (!project) return;
+  returnFocusTo = document.activeElement;
+  activeProject = project;
+  activeImageIndex = 0;
+  fillText("modalCategory", project.category);
+  fillText("modalTitle", project.title);
+  fillText("modalOverview", project.overview);
+  fillText("modalGoal", project.goal);
+  fillText("modalContribution", project.contribution);
+  fillText("modalFocus", project.focus);
+  fillText("modalNext", project.next);
+  fillHighlights(project.highlights);
+  fillTags("modalTech", project.technologies);
+  fillResourceLinks(project.links);
 
-    currentImageIndex--;
+  galleryDots.replaceChildren();
+  project.images.forEach((_, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.setAttribute("aria-label", `Show screenshot ${index + 1} of ${project.images.length}`);
+    dot.addEventListener("click", () => { activeImageIndex = index; updateGallery(); });
+    galleryDots.appendChild(dot);
+  });
+  const multipleImages = project.images.length > 1;
+  galleryPrev.hidden = !multipleImages;
+  galleryNext.hidden = !multipleImages;
+  galleryDots.hidden = !multipleImages;
+  updateGallery();
 
-    if (currentImageIndex < 0) {
-        currentImageIndex = currentProject.images.length - 1;
-    }
-
-    updateGallery();
+  modal.hidden = false;
+  document.body.classList.add("modal-open");
+  pageRegions.forEach((region) => { region.inert = true; });
+  modalPanel.scrollTop = 0;
+  closeModalButton.focus();
 }
 
 function closeProject() {
-    const modal = document.getElementById("projectModal");
-
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("modal-open");
-
-    currentProject = null;
-    currentImageIndex = 0;
+  if (modal.hidden) return;
+  modal.hidden = true;
+  document.body.classList.remove("modal-open");
+  pageRegions.forEach((region) => { region.inert = false; });
+  activeProject = null;
+  activeImageIndex = 0;
+  modalImage.removeAttribute("src");
+  if (returnFocusTo && returnFocusTo.isConnected) returnFocusTo.focus();
+  returnFocusTo = null;
 }
 
-window.addEventListener("click", function (event) {
-    const modal = document.getElementById("projectModal");
-
-    if (event.target === modal) {
-        closeProject();
-    }
+document.querySelectorAll(".project-trigger").forEach((button) => {
+  button.addEventListener("click", () => showProject(button.dataset.project));
+});
+closeModalButton.addEventListener("click", closeProject);
+galleryPrev.addEventListener("click", () => moveGallery(-1));
+galleryNext.addEventListener("click", () => moveGallery(1));
+modal.addEventListener("click", (event) => { if (event.target === modal) closeProject(); });
+modalImage.addEventListener("error", () => {
+  if (modal.hidden) return;
+  modalImage.hidden = true;
+  galleryFallback.hidden = false;
+  galleryFallback.textContent = "Screenshot not found. Add the image file to the images folder.";
 });
 
-document.addEventListener("keydown", function (event) {
-    const modal = document.getElementById("projectModal");
+document.addEventListener("keydown", (event) => {
+  if (modal.hidden) return;
+  if (event.key === "Escape") { event.preventDefault(); closeProject(); return; }
+  if (event.key === "ArrowRight") { event.preventDefault(); moveGallery(1); return; }
+  if (event.key === "ArrowLeft") { event.preventDefault(); moveGallery(-1); return; }
+  if (event.key !== "Tab") return;
 
-    if (!modal.classList.contains("show")) {
-        return;
-    }
-
-    if (event.key === "Escape") {
-        closeProject();
-    }
-
-    if (event.key === "ArrowRight") {
-        nextImage();
-    }
-
-    if (event.key === "ArrowLeft") {
-        previousImage();
-    }
+  const focusable = [...modalPanel.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+    .filter((element) => !element.closest("[hidden]") && !element.hidden);
+  if (!focusable.length) { event.preventDefault(); modalPanel.focus(); return; }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
 });
 
-const menuButton = document.getElementById("menuButton");
+/* Mobile navigation */
+const menuToggle = document.getElementById("menuToggle");
 const navLinks = document.getElementById("navLinks");
+function closeMenu() {
+  navLinks.classList.remove("is-open");
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "Open navigation menu");
+  menuToggle.querySelector("span").textContent = "☰";
+}
+menuToggle.addEventListener("click", () => {
+  const isOpen = navLinks.classList.toggle("is-open");
+  menuToggle.setAttribute("aria-expanded", String(isOpen));
+  menuToggle.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
+  menuToggle.querySelector("span").textContent = isOpen ? "×" : "☰";
+});
+navLinks.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && navLinks.classList.contains("is-open")) { closeMenu(); menuToggle.focus(); }
+});
+window.addEventListener("resize", () => { if (window.innerWidth > 1120) closeMenu(); });
 
-if (menuButton && navLinks) {
-    menuButton.addEventListener("click", function () {
-        navLinks.classList.toggle("active");
+/* Light/dark theme, with saved preference when storage is available */
+const themeToggle = document.getElementById("themeToggle");
+let storedTheme = null;
+try { storedTheme = localStorage.getItem("portfolio-theme"); } catch (_) { /* Storage is optional. */ }
+function setTheme(theme) {
+  const dark = theme === "dark";
+  document.documentElement.dataset.theme = theme;
+  themeToggle.querySelector("span").textContent = dark ? "☀" : "☾";
+  themeToggle.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", dark ? "#101a18" : "#f7f8f5");
+}
+setTheme(storedTheme === "dark" ? "dark" : "light");
+themeToggle.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  setTheme(next);
+  try { localStorage.setItem("portfolio-theme", next); } catch (_) { /* Keep the current-session theme. */ }
+});
 
-        const isOpen = navLinks.classList.contains("active");
+/* Friendly fallback when a portrait or project screenshot is missing */
+const profilePhoto = document.getElementById("profilePhoto");
+function showMissingProfile() { profilePhoto.closest(".portrait-frame").classList.add("image-missing"); }
+profilePhoto.addEventListener("error", showMissingProfile);
+if (profilePhoto.complete && profilePhoto.naturalWidth === 0) showMissingProfile();
+document.querySelectorAll(".project-cover img").forEach((image) => {
+  const showFallback = () => image.closest(".project-cover").classList.add("image-missing");
+  image.addEventListener("error", showFallback);
+  if (image.complete && image.naturalWidth === 0) showFallback();
+});
 
-        menuButton.setAttribute(
-            "aria-expanded",
-            isOpen ? "true" : "false"
-        );
-
-        menuButton.setAttribute(
-            "aria-label",
-            isOpen ? "Close navigation menu" : "Open navigation menu"
-        );
-
-        menuButton.textContent = isOpen ? "×" : "☰";
-    });
-
-    document.querySelectorAll(".nav-links a").forEach(function (link) {
-        link.addEventListener("click", function () {
-            navLinks.classList.remove("active");
-
-            menuButton.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-
-            menuButton.setAttribute(
-                "aria-label",
-                "Open navigation menu"
-            );
-
-            menuButton.textContent = "☰";
-        });
-    });
+/* Show the résumé download only if the real PDF exists on the site */
+if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+  fetch("assets/resume.pdf", { method: "HEAD" })
+    .then((response) => {
+      if (!response.ok || !response.headers.get("content-type")?.includes("pdf")) return;
+      document.getElementById("resumeLink").hidden = false;
+      document.getElementById("resumeRequest").hidden = true;
+    })
+    .catch(() => { /* Keep the email request link if the file is unavailable. */ });
 }
 
+/* Back to top and current year */
 const backToTop = document.getElementById("backToTop");
-
-if (backToTop) {
-    window.addEventListener("scroll", function () {
-        if (window.scrollY > 500) {
-            backToTop.classList.add("show");
-        } else {
-            backToTop.classList.remove("show");
-        }
-    });
-
-    backToTop.addEventListener("click", function () {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    });
-}
+function updateBackToTop() { backToTop.classList.toggle("show", window.scrollY > 450); }
+window.addEventListener("scroll", updateBackToTop, { passive: true });
+updateBackToTop();
+backToTop.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+});
+document.getElementById("currentYear").textContent = new Date().getFullYear();
